@@ -1,0 +1,17 @@
+# Context and session docs — keep local only
+CLAUDE.md
+*_context.md
+*_Context*.md
+BuySell_NetSuite_Session_Context*.md
+
+# SQL views not tracked here
+SQL/create_vw*.sql
+
+# Local data, notebooks, dashboards
+Data/
+Notebooks/
+PowerBI/
+Docs/
+*.csv
+*.xlsx
+*.html
