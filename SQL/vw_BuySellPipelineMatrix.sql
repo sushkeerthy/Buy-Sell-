@@ -176,7 +176,12 @@ SELECT
     d.SuccessFee   * d.DealStageProbability                 AS ProbabilityExpectedFeeRevenue,
 
     d.BACMemberStatus,
-    d.BACMembershipTier,
+    CASE d.BACMembershipTier
+        WHEN 'Standard' THEN 'Full Member'
+        WHEN 'Premium'  THEN 'Renewal - No Hours'
+        WHEN 'VIP'      THEN 'Renewal + Advisory Hours'
+        ELSE d.BACMembershipTier
+    END                                                     AS BACMembershipTier,
     d.BACMembershipStartDate,
     d.BACRenewalDate,
 
@@ -186,9 +191,10 @@ SELECT
     END                                                     AS DaysUntilRenewal,
 
     CASE
-        WHEN d.BACRenewalDate IS NULL                        THEN 'No Renewal Date'
-        WHEN DATEDIFF(DAY, GETDATE(), d.BACRenewalDate) < 0  THEN 'Past Due'
-        WHEN DATEDIFF(DAY, GETDATE(), d.BACRenewalDate) <= 90 THEN 'Within 90 Days'
+        WHEN d.BACRenewalDate IS NULL                                                       THEN 'No Renewal Date'
+        WHEN DATEDIFF(DAY, GETDATE(), d.BACRenewalDate) < 0 AND sm.StageName = 'Delivered' THEN 'Past Due - Delivered'
+        WHEN DATEDIFF(DAY, GETDATE(), d.BACRenewalDate) < 0                                 THEN 'Past Due'
+        WHEN DATEDIFF(DAY, GETDATE(), d.BACRenewalDate) <= 90                               THEN 'Within 90 Days'
         ELSE 'Active'
     END                                                     AS RenewalStatus,
 
@@ -296,7 +302,13 @@ SELECT
     d.EstimatedValue * d.DealStageProbability               AS ExpectedWeightedValue,
     d.SuccessFee   * d.DealStageProbability                 AS ProbabilityExpectedFeeRevenue,
 
-    d.BACMemberStatus, d.BACMembershipTier,
+    d.BACMemberStatus,
+    CASE d.BACMembershipTier
+        WHEN 'Standard' THEN 'Full Member'
+        WHEN 'Premium'  THEN 'Renewal - No Hours'
+        WHEN 'VIP'      THEN 'Renewal + Advisory Hours'
+        ELSE d.BACMembershipTier
+    END                                                     AS BACMembershipTier,
     d.BACMembershipStartDate, d.BACRenewalDate,
 
     CASE
@@ -305,8 +317,8 @@ SELECT
     END                                                     AS DaysUntilRenewal,
 
     CASE
-        WHEN d.BACRenewalDate IS NULL                        THEN 'No Renewal Date'
-        WHEN DATEDIFF(DAY, GETDATE(), d.BACRenewalDate) < 0  THEN 'Past Due'
+        WHEN d.BACRenewalDate IS NULL                         THEN 'No Renewal Date'
+        WHEN DATEDIFF(DAY, GETDATE(), d.BACRenewalDate) < 0   THEN 'Past Due'
         WHEN DATEDIFF(DAY, GETDATE(), d.BACRenewalDate) <= 90 THEN 'Within 90 Days'
         ELSE 'Active'
     END                                                     AS RenewalStatus,
